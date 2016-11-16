@@ -7,6 +7,11 @@
   struct elemento *siguiente: es el apuntador al siguiente elemento de la lista
   void *valor: es el apuntador al valor guardado
 */
+//Definimos la estructura elemento
+struct elemento {
+   struct elemento  *siguiente; //Definimos un apuntador del tipo elemento que apuntará al siguiente elemento
+   void  *valor; //Definimos un apuntador que apuntará al valor guardado
+}; 
 
 // defino alias para los datos (struct elemento) y (Elemento**)
 typedef struct elemento Elemento; /*No cambies esta línea*/
