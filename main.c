@@ -12,9 +12,9 @@ int cmp_int(const void *a, const void *b){
     //Lo mismo para b
     elemento *direccionP2 = (elemento *) b;
     //Obtenemos el valor de los 'elemento'
-    //Version larga
-    int v1 = (*direccionP).valor;
-    int v2 = (*direccionP2).valor;
+    //Version con flechas es más facil para castings
+    int v1 = *(int*)direccionP->valor;
+    int v2 = *(int*)direccionP2->valor;
     //hacemos las comparaciones
     if(v1 < v2){
         return -1;
@@ -34,18 +34,18 @@ size_t longitud(Lista lista){
 	if(*lista == NULL){
 		return 0;
 	} else{
-		size_t longitud = 0;
+		size_t size = 0;
 		int indice = 0;
-		Elemento* sigue = lista;
+		Elemento* sigue = *lista;
 		while(sigue != NULL){
-			sigue = sigue.siguiente;
-			longitud+=1;
+			sigue = (*sigue).siguiente;
+			size+=1;
 			indice+=1;
 		}
-
+        	return size;
 	}
-	return longitud;
 }
+
 /*Crea una lista vacía*/
 Lista crea_lista(){
 	//Se aparta el espacio en el heap para la lista
@@ -56,24 +56,67 @@ Lista crea_lista(){
 /*Función que ordena una lista usando una función comparadora*/
 //Recomiendo apoyarte de tu función 'cmp_int', qsort y un arreglo
 void ordena_lista(Lista lista, int(*cmp)(const void*, const void*)){
-	size_t longitud = longitud(lista);
-//????????????????????
+	//Obtenemos el tamaño de la lista
+	size_t tamano = longitud(lista);
+	//Hacemos un arreglo del tamaño de la lista
+	int valores[longitud];
+	int indice = 0;
+	//tomamos un valor auxiliar para tomar elementos de la lista
+	Elemento *nodo = *lista;
+	//En este for vamos a rellenar el arreglo con los valores de la lista
+	for(indice;indice<tamano;indice++){
+		//Obtenemos el valor del elemento
+		int valorElem = *(int*)nodo->valor;
+		valores[indice] = valorElem;
+		nodo = (*nodo).siguiente;
+	}
+	//Quicksort se basa en un arreglo para funcionar, por eso la creacion del mismo
+	//Llamamos a Qsort para que ordene los valores del arreglo
+	//Aquí mandamos a llamar a la funcion que ordena enteros
+	qsort(valores,longitud,sizeof(int),(*cmp));
+	//Ya ordenados los volvemos a meter a la lista
+	for(indice;indice<tamano;indice++){
+		*(int*)nodo->valor = valores[indice];
+		*nodo = (*nodo).siguiente;
+	}
     
 }
 
 /*Libera(free) la memoria ocupada por la lista, sus elementos y valores*/
 //No se te olvide liberar la memoria de cada elemento y su valor.
-void borra_lista(Lista){
-//????????????
+void borra_lista(Lista lista){
+
+}
+
+/*Remueve un elemento de una lista en una posición dada*/
+//Si la posición no coincide con ningún elemento se regresa NULL
+Elemento *quita_elemento(Lista, size_t posicion){
+
+}
+
+/*Inserta un elemento en la lista y se regresa el nuevo tamaño de la lista*/
+int inserta_elemento(Lista lista, void *valor){
+	//Obtenemos el tamaño de la lista
+	size_t tamano = longitud(lista);
+	//Creamos un nuevo elemento
+	Elemento *recien = malloc(sizeof(Elemento));
+	//Le damos direcciones a este nuevo elemento
+	(*recien).siguiente = *lista;
+	recien->valor = valor;
+	//Apuntamos la cabeza al nuevo elemento
+	*lista = recien;
+	int nuevoTam = tamano + 1;
+	return nuevoTam;
 }
 
 /*Imprime los elementos de la lista como enteros*/
 void imprime_lista_int(Lista lista){
 	size_t largo = longitud(lista);
 	int indice = 0;
-	for(indice; indice<largo;indice++){
-		int valor = *(int*)lista.valor;
+	while(lista){
+		int valor = *(int*)lista->valor;
 		printf("%d\n", valor);
+		lista = lista->siguiente;
 	}
     
 }
@@ -117,6 +160,6 @@ void inserta_datos_de_prueba(Lista lista)
     for (indice = 0; indice < 20; ++indice) {
         num_a_insertar = malloc(sizeof(int));
         *num_a_insertar = rand() % 100;
-        inserta_elemento(lista, num_a_insertar);
+        inserta_elemento(lista, num_a_insesrtar);
     };
 }
