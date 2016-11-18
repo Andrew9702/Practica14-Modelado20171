@@ -27,9 +27,9 @@ size_t longitud(Lista lista){
 		return 0;
 	} else{
 		size_t size = 0;
-		Elemento* sigue = *lista;
-		while(sigue != NULL){
-			sigue = (*sigue).siguiente;
+		Elemento* derecho = *lista;
+		while(derecho != NULL){
+			derecho = derecho->siguiente;
 			size+=1;
 		}
         return size;
@@ -75,13 +75,21 @@ void ordena_lista(Lista lista, int(*cmp)(const void*, const void*)){
 /*Libera(free) la memoria ocupada por la lista, sus elementos y valores*/
 //No se te olvide liberar la memoria de cada elemento y su valor.
 void borra_lista(Lista lista){
+	//Una manera practica es borrar toda la lista one by one
 	size_t largo = longitud(lista);
 	int indice = 0;
-	Elemento *aux = *lista;
-	while(lista){
-		int valor = *(int*)aux->valor;
-		printf("%d\n", valor);
-		aux = aux->siguiente;
+	//Necesitamos algo que apunte al elemento para que no se pierdan los valores
+	Elemento *aiuda;
+	//De esta manera iremos quitando los valores en la lista de cabeza en cabeza
+	for(indice;indice<largo;indice++){
+		aiuda = quita_elemento(lista,0);
+		//En el caso de que lleguemos al ultimo evitemos problemas
+		if(aiuda!=NULL){
+			free(aiuda -> valor);
+			free(aiuda);
+		}
+	}
+	free(lista);
 }
 
 /*Remueve un elemento de una lista en una posición dada*/
@@ -94,6 +102,15 @@ Elemento *quita_elemento(Lista lista, size_t posicion){
 		return NULL;
 	}
 
+	//Casos para tramposos, si no existe el indice, pos ya
+	if(posicion>=longitud(lista)){
+		return NULL;
+	}
+
+	//Indice invalido, por si las moscas
+	if(posicion<0){
+		return NULL;
+	}
 	//Caso en que sea la primera posicion
 	if(posicion == 0){
 		//Apuntador al elemento siguiente del que se quiere remover
@@ -117,18 +134,17 @@ Elemento *quita_elemento(Lista lista, size_t posicion){
 		cola -> valor = NULL;
 		vagonero -> siguiente = NULL;
 		return cola;
+
 	} else { //Si no es ni el primero ni el ultimo 
 		//Siempre vamos a empezar por la cabeza, por lo que para llegar a una posicion, simplemente podemos iterar sobre lista
 		Elemento *antes = *lista;
-		for(indice;indice<posicion-1;indice++){
+		for(indice;indice<posicion;indice++){
 			antes = antes->siguiente;
 		}
 		//Ya tenemos el que queremos eliminar
 		Elemento *encontrado = antes->siguiente;
-		//El que sigue al que queremos eliminar
-		Elemento *despues = encontrado->siguiente;
 		//Igualamos el siguiente del nodo anterior al que buscamos, al siguiente del que buscamos
-		antes -> siguiente = despues;
+		antes -> siguiente = encontrado->siguiente;
 		//Le quitamos sus valores al que queriamos encontrar
 		encontrado ->siguiente = NULL;
 		encontrado ->valor = NULL;
@@ -158,7 +174,8 @@ void imprime_lista_int(Lista lista){
 	Elemento *aux = *lista;
 	while(lista){
 		int valor = *(int*)aux->valor;
-		printf("%d\n", valor);
+		printf("el valor en el indice %d es:  %d\n", indice, valor);
+		indice+=1;
 		aux = aux->siguiente;
 	} 
 }
@@ -167,23 +184,26 @@ int main()
 {
     // Se crea la lista
     Lista lista = crea_lista();
-    printf("La lista tiene %d elementos\n", longitud(lista));
+    printf("La lista tiene %d elementos al ser creada\n", longitud(lista));
 
     // Se insertan datos de prueba
     inserta_datos_de_prueba(lista);
-    printf("La lista tiene %d elementos\n", longitud(lista));
+    printf("La lista tiene %d elementos despues de haberla rellenado\n", longitud(lista));
 
     // Se remueve un elemento de la lista
     Elemento *borrado = quita_elemento(lista, 0);
-    if (borrado != NULL) {free(borrado->valor);}
-    free(borrado);
-    printf("La lista tiene %d elementos\n", longitud(lista));
+    if (borrado != NULL) {
+    	free(borrado->valor);
+    	free(borrado);
+	}
+    printf("La lista sin la primer cabeza tiene %d elementos\n", longitud(lista));
 
     // Se remueve un elemento que no existe en la lista
     quita_elemento(lista, longitud(lista));
-    printf("La lista tiene %d elementos\n", longitud(lista));
+    printf("La lista tiene %d elementos, ese indice no existe\n", longitud(lista));
 
     //Se imprime la lista antes de ordenar
+    printf("*****************Esta es tu lista antes de ser ordenada************\n");
     imprime_lista_int(lista);
     ordena_lista(lista, &cmp_int);
 
@@ -192,6 +212,8 @@ int main()
 
     //Se libera la memoria ocupada
     borra_lista(lista);
+    system("PAUSE");
+
 }
 
 void inserta_datos_de_prueba(Lista lista)
