@@ -7,18 +7,21 @@ void inserta_datos_de_prueba(Lista lista);
 //Los parametros const void, apuntan a un espacio de memoria que no será modificado
 //Si los enteros son identicos se regresa 0 (C no tiene booleanos :/)
 int cmp_int(const void *a, const void *b){
-    //Se obtiene el apuntador a elemento de los parametros.
-    Elemento *direccionP = (Elemento *) a;
+    //Se obtiene el valor del apuntador en un entero, haciendo un casting al tipo de valor int para el apuntador
+    int v1 = *(int *) a;
     //Lo mismo para b
-    Elemento *direccionP2 = (Elemento *) b;
-    //Obtenemos el valor de los 'elemento'
-    //Version con flechas es más facil para castings
-    int v1 = *(int*)direccionP->valor;
-    int v2 = *(int*)direccionP2->valor;
-    //hacemos las comparaciones
+    int v2 = *(int *) b;
+    if(v1 < v2){
+        return -1;
+    } 
     if(v1 == v2){
         return 0;
     }
+    if(v1>v2){
+        return 1;
+    }
+
+    return 0;
 }
 
 /*Regresa el número de elementos en la lista*/
@@ -54,20 +57,26 @@ void ordena_lista(Lista lista, int(*cmp)(const void*, const void*)){
 	//tomamos un valor auxiliar para tomar elementos de la lista
 	Elemento *nodo = *lista;
 	//En este for vamos a rellenar el arreglo con los valores de la lista
-	for(indice;indice<tamano;indice++){
-		//Obtenemos el valor del elemento
-		int valorElem = *(int*)nodo->valor;
-		valores[indice] = valorElem;
-		nodo = (*nodo).siguiente;
+	while(nodo !=NULL){
+			//Obtenemos el valor del elemento
+			int valorElem = *(int*)nodo->valor;
+			valores[indice] = valorElem;
+			nodo = (*nodo).siguiente;
+			indice+=1;
+			printf("Esto esta en valores[%d]: %d\n", indice, valorElem);
 	}
+	indice = 0;
 	//Quicksort se basa en un arreglo para funcionar, por eso la creacion del mismo
 	//Llamamos a Qsort para que ordene los valores del arreglo
 	//Aquí mandamos a llamar a la funcion que ordena enteros
 	qsort(valores,tamano,sizeof(int),(*cmp));
 	//Ya ordenados los volvemos a meter a la lista
-	for(indice;indice<tamano;indice++){
-		*(int*)nodo->valor = valores[indice];
-		nodo = (*nodo).siguiente;
+	while(nodo != NULL){
+			*(int*)nodo->valor = valores[indice];
+			int valorElem = valores[indice];
+			printf("Ahora Esto esta en valores[%d]: %d\n", indice, valorElem);
+			nodo = (*nodo).siguiente;
+			indice+=1;
 	}
     
 }
@@ -169,10 +178,9 @@ int inserta_elemento(Lista lista, void *valor){
 
 /*Imprime los elementos de la lista como enteros*/
 void imprime_lista_int(Lista lista){
-	size_t largo = longitud(lista);
 	int indice = 0;
 	Elemento *aux = *lista;
-	while(lista){
+	while(aux != NULL){
 		int valor = *(int*)aux->valor;
 		printf("el valor en el indice %d es:  %d\n", indice, valor);
 		indice+=1;
@@ -207,6 +215,7 @@ int main()
     imprime_lista_int(lista);
     ordena_lista(lista, &cmp_int);
 
+    printf("*****************Esta es tu lista despues de ser ordenada************\n");
     //Se imprime la lista después de ordenar
     imprime_lista_int(lista);
 
