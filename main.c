@@ -185,41 +185,38 @@ void imprime_lista_int(Lista lista){
 	} 
 }
 
+
 int main()
 {
     // Se crea la lista
     Lista lista = crea_lista();
-    printf("La lista tiene %d elementos al ser creada\n", longitud(lista));
+    printf("La lista tiene %d elementos\n", longitud(lista));
 
     // Se insertan datos de prueba
     inserta_datos_de_prueba(lista);
-    printf("La lista tiene %d elementos despues de haberla rellenado\n", longitud(lista));
-
+    printf("La lista tiene %d elementos\n", longitud(lista));
     // Se remueve un elemento de la lista
     Elemento *borrado = quita_elemento(lista, 0);
-    if (borrado != NULL) {
-    	free(borrado->valor);
-    	free(borrado);
-	}
-    printf("La lista sin la primer cabeza tiene %d elementos\n", longitud(lista));
+    if (borrado != NULL) {free(borrado->valor);}
+    free(borrado);
+    printf("La lista tiene %d elementos\n", longitud(lista));
 
     // Se remueve un elemento que no existe en la lista
     quita_elemento(lista, longitud(lista));
-    printf("La lista tiene %d elementos, ese indice no existe\n", longitud(lista));
+    printf("La lista tiene %d elementos\n", longitud(lista));
 
+    printf("***********Lista ANTES de ser ordenada**********\n");
     //Se imprime la lista antes de ordenar
-    printf("*****************Esta es tu lista antes de ser ordenada************\n");
     imprime_lista_int(lista);
     ordena_lista(lista, &cmp_int);
 
-    printf("*****************Esta es tu lista despues de ser ordenada************\n");
+    printf("***********Lista LUEGO de ser ordenada**********\n");
     //Se imprime la lista después de ordenar
     imprime_lista_int(lista);
 
     //Se libera la memoria ocupada
     borra_lista(lista);
     system("PAUSE");
-
 }
 
 void inserta_datos_de_prueba(Lista lista)
