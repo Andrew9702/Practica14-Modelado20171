@@ -50,34 +50,30 @@ Lista crea_lista(){
 //Recomiendo apoyarte de tu función 'cmp_int', qsort y un arreglo
 void ordena_lista(Lista lista, int(*cmp)(const void*, const void*)){
 	//Obtenemos el tamaño de la lista
-	size_t tamano = longitud(lista);
+	size_t tamano= longitud(lista);	
 	//Hacemos un arreglo del tamaño de la lista
 	int valores[tamano];
-	int indice = 0;
-	//tomamos un valor auxiliar para tomar elementos de la lista
-	Elemento *nodo = *lista;
+	int indice;
+	Elemento *nodo= *lista;
+	//Guardamos la lista para corregir los valores cambiados
+	Elemento *nodoDespues= *lista;
+
 	//En este for vamos a rellenar el arreglo con los valores de la lista
-	while(nodo !=NULL){
-			//Obtenemos el valor del elemento
-			int valorElem = *(int*)nodo->valor;
-			valores[indice] = valorElem;
-			nodo = (*nodo).siguiente;
-			indice+=1;
-			printf("Esto esta en valores[%d]: %d\n", indice, valorElem);
-	}
-	indice = 0;
+	for(indice=0; indice<tamano; indice++){
+		//Obtenemos el valor del elemento
+		valores[indice]= *(int*)nodo->valor;
+		nodo= nodo->siguiente;
+	}	
 	//Quicksort se basa en un arreglo para funcionar, por eso la creacion del mismo
 	//Llamamos a Qsort para que ordene los valores del arreglo
 	//Aquí mandamos a llamar a la funcion que ordena enteros
 	qsort(valores,tamano,sizeof(int),(*cmp));
+
 	//Ya ordenados los volvemos a meter a la lista
-	while(nodo != NULL){
-			*(int*)nodo->valor = valores[indice];
-			int valorElem = valores[indice];
-			printf("Ahora Esto esta en valores[%d]: %d\n", indice, valorElem);
-			nodo = (*nodo).siguiente;
-			indice+=1;
-	}
+	for(indice=0; indice<tamano; indice++){
+		*(int*)nodoDespues->valor= valores[indice];
+		nodoDespues= nodoDespues->siguiente;
+	}	
     
 }
 
@@ -189,33 +185,31 @@ void imprime_lista_int(Lista lista){
 }
 
 int main()
-{
+{	
     // Se crea la lista
     Lista lista = crea_lista();
-    printf("La lista tiene %d elementos al ser creada\n", longitud(lista));
+    printf("La lista tiene %d elementos\n", longitud(lista));
 
     // Se insertan datos de prueba
     inserta_datos_de_prueba(lista);
-    printf("La lista tiene %d elementos despues de haberla rellenado\n", longitud(lista));
+    printf("La lista tiene %d elementos\n", longitud(lista));
 
     // Se remueve un elemento de la lista
-    Elemento *borrado = quita_elemento(lista, 0);
-    if (borrado != NULL) {
-    	free(borrado->valor);
-    	free(borrado);
-	}
-    printf("La lista sin la primer cabeza tiene %d elementos\n", longitud(lista));
+    Elemento *borrado;
+    borrado = quita_elemento(lista, 0);
+    if (borrado != NULL) {free(borrado->valor);}
+    free(borrado);
+    printf("La lista tiene %d elementos\n", longitud(lista));
 
+    printf("***********Lista ANTES de Ordenar***********\n");
     // Se remueve un elemento que no existe en la lista
     quita_elemento(lista, longitud(lista));
-    printf("La lista tiene %d elementos, ese indice no existe\n", longitud(lista));
+    printf("La lista tiene %d elementos\n", longitud(lista));
 
     //Se imprime la lista antes de ordenar
-    printf("*****************Esta es tu lista antes de ser ordenada************\n");
     imprime_lista_int(lista);
     ordena_lista(lista, &cmp_int);
-
-    printf("*****************Esta es tu lista despues de ser ordenada************\n");
+	printf("***********Lista LUEGO de Ordenar***********\n");
     //Se imprime la lista después de ordenar
     imprime_lista_int(lista);
 
@@ -224,6 +218,7 @@ int main()
     system("PAUSE");
 
 }
+
 
 void inserta_datos_de_prueba(Lista lista)
 {
